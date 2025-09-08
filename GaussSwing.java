@@ -3,8 +3,6 @@ package backend;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import backend.GaussEliminacao;
-// Removido import estático
 
 public class GaussSwing extends JFrame {
     private JTextField sizeField;
@@ -80,11 +78,38 @@ public class GaussSwing extends JFrame {
                 }
                 b[i] = Double.parseDouble(rhsFields[i].getText().trim());
             }
+            
+            // Solução por Gauss
             double[] x = GaussEliminacao.solve(A, b);
+            
+            // Decomposição LU
+            double[][][] LU = GaussEliminacao.decomposicaoLU(A);
+            double[][] L = LU[0];
+            double[][] U = LU[1];
+            
             StringBuilder sb = new StringBuilder();
+            sb.append("Solução por Eliminação de Gauss:\n");
             for (int i = 0; i < n; i++) {
                 sb.append("x[").append(i + 1).append("] = ").append(String.format("%.6f", x[i])).append("\n");
             }
+            
+            sb.append("\nDecomposição LU:\n");
+            sb.append("L = \n");
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    sb.append(String.format("%8.3f", L[i][j]));
+                }
+                sb.append("\n");
+            }
+            
+            sb.append("\nU = \n");
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    sb.append(String.format("%8.3f", U[i][j]));
+                }
+                sb.append("\n");
+            }
+            
             resultArea.setText(sb.toString());
         } catch (Exception ex) {
             resultArea.setText("Erro: " + ex.getMessage());

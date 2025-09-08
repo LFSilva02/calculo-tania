@@ -88,6 +88,50 @@ public class GaussEliminacao {
     }
 
     // ---------------- Exemplo rapido de uso ----------------
+    /**
+     * Realiza a decomposição LU de uma matriz A.
+     * Retorna as matrizes L (triangular inferior) e U (triangular superior).
+     * A = L * U
+     * @param A matriz de entrada (n x n)
+     * @return array com [L, U]
+     */
+    public static double[][][] decomposicaoLU(double[][] A) {
+        int n = A.length;
+        if (n == 0 || A[0].length != n) {
+            throw new IllegalArgumentException("Matriz deve ser quadrada");
+        }
+
+        double[][] L = new double[n][n];
+        double[][] U = new double[n][n];
+        
+        // Inicializa L com 1's na diagonal
+        for (int i = 0; i < n; i++) {
+            L[i][i] = 1.0;
+        }
+        
+        // Copia A para U inicialmente
+        for (int i = 0; i < n; i++) {
+            System.arraycopy(A[i], 0, U[i], 0, n);
+        }
+
+        // Decomposição LU sem pivotamento
+        for (int k = 0; k < n; k++) {
+            // Verifica pivô nulo
+            if (Math.abs(U[k][k]) < 1e-15) {
+                throw new ArithmeticException("Pivô nulo encontrado na decomposição LU");
+            }
+
+            for (int i = k + 1; i < n; i++) {
+                L[i][k] = U[i][k] / U[k][k];
+                for (int j = k; j < n; j++) {
+                    U[i][j] = U[i][j] - L[i][k] * U[k][j];
+                }
+            }
+        }
+
+        return new double[][][] {L, U};
+    }
+
     public static void main(String[] args) {
         // Exemplo:
         // 2x + 3y -  z =  5
@@ -101,7 +145,14 @@ public class GaussEliminacao {
         double[] b = {5, 6, 28};
 
         double[] x = solve(A, b);
+        System.out.println("Solução por Gauss:");
         System.out.println("x = " + Arrays.toString(x));
-        // Saida esperada aproximada: [1.0, 2.0, 0.0]
+
+        System.out.println("\nDecomposição LU:");
+        double[][][] LU = decomposicaoLU(A);
+        System.out.println("L = ");
+        for (double[] row : LU[0]) System.out.println(Arrays.toString(row));
+        System.out.println("U = ");
+        for (double[] row : LU[1]) System.out.println(Arrays.toString(row));
     }
 }
