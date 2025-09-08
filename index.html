@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Métodos Numéricos — Bisseção, Gauss e LU</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Métodos Numéricos</h1>
+    <p>Bisseção • Eliminação de Gauss • Fatoração PA = LU</p>
+  </header>
+
+  <main>
+    <nav class="tabs">
+      <button class="tab active" data-tab="bissecao">Bisseção</button>
+      <button class="tab" data-tab="gauss">Gauss / LU</button>
+    </nav>
+
+    <section id="bissecao" class="tab-panel active">
+      <div class="card">
+        <h2>Método da Bisseção</h2>
+        <div class="grid2">
+          <label>f(x)</label>
+          <input id="fx" value="x^3 - x - 2" />
+          <label>a</label>
+          <input id="a" value="1" />
+          <label>b</label>
+          <input id="b" value="2" />
+          <label>Tolerância</label>
+          <input id="tol" value="1e-6" />
+          <label>Máx. Iterações</label>
+          <input id="maxIt" value="100" />
+        </div>
+        <div class="actions">
+          <button id="btnBissecao">Calcular Bisseção</button>
+          <small class="hint">Use + − * / ^, parênteses e funções: sin, cos, tan, sqrt, exp, ln/log, abs, log10. Constantes: pi, e.</small>
+        </div>
+        <pre id="outBissecao" class="output"></pre>
+      </div>
+    </section>
+
+    <section id="gauss" class="tab-panel">
+      <div class="card">
+        <h2>Eliminação de Gauss e Fatoração PA = LU</h2>
+        <div class="row">
+          <label>n (3 a 10)</label>
+          <input id="n" type="number" min="3" max="10" value="3" style="width:100px" />
+          <button id="btnGerar">Gerar matriz A e vetor b</button>
+        </div>
+        <div id="gridWrap"></div>
+        <div class="actions">
+          <button id="btnGauss">Resolver Ax=b (Gauss)</button>
+          <button id="btnLU">Fatorar PA = LU</button>
+        </div>
+        <pre id="outGauss" class="output"></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <small>Projeto didático • Funciona localmente (abra o arquivo <code>index.html</code> no navegador ou use Live Server no VS Code)</small>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
