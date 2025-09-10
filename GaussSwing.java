@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class GaussSwing extends JFrame {
+public class GaussSwing extends JPanel {
     private JTextField sizeField;
     private JPanel matrixPanel;
     private JButton solveButton;
@@ -13,12 +13,22 @@ public class GaussSwing extends JFrame {
     private JTextField[] rhsFields;
     private int n;
 
+    // Para uso standalone
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Método de Gauss");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.add(new GaussSwing());
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
+    }
+
     public GaussSwing() {
-        setTitle("Eliminação de Gauss - Sistema Linear");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(600, 500);
         setLayout(new BorderLayout());
 
+        // Painel superior com tamanho da matriz e botões
         JPanel topPanel = new JPanel();
         topPanel.add(new JLabel("Tamanho da matriz (n): "));
         sizeField = new JTextField("3", 3);
@@ -28,17 +38,50 @@ public class GaussSwing extends JFrame {
         topPanel.add(setSizeButton);
         add(topPanel, BorderLayout.NORTH);
 
+        // Painel central para a matriz
         matrixPanel = new JPanel();
         add(matrixPanel, BorderLayout.CENTER);
 
+        // Painel inferior com botões
+        JPanel bottomPanel = new JPanel();
         solveButton = new JButton("Resolver sistema");
         solveButton.addActionListener(this::solveSystem);
         solveButton.setEnabled(false);
-        add(solveButton, BorderLayout.SOUTH);
+        bottomPanel.add(solveButton);
+
+        // Exemplo predefinido
+        JButton exemploPadrao = new JButton("Carregar exemplo");
+        exemploPadrao.addActionListener(this::carregarExemplo);
+        bottomPanel.add(exemploPadrao);
+        
+        add(bottomPanel, BorderLayout.SOUTH);
 
         resultArea = new JTextArea(5, 40);
         resultArea.setEditable(false);
         add(new JScrollPane(resultArea), BorderLayout.EAST);
+    }
+
+    private void carregarExemplo(ActionEvent e) {
+        // Define tamanho 3x3
+        sizeField.setText("3");
+        setMatrixSize(null);
+        
+        // Exemplo: 2x + 3y - z = 5
+        //         4x + y + 5z = 6
+        //        -2x + 5y + 3z = 28
+        double[][] A = {
+            { 2,  3, -1},
+            { 4,  1,  5},
+            {-2,  5,  3}
+        };
+        double[] b = {5, 6, 28};
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                coefFields[i][j].setText(String.valueOf(A[i][j]));
+            }
+            rhsFields[i].setText(String.valueOf(b[i]));
+        }
     }
 
     private void setMatrixSize(ActionEvent e) {
@@ -80,24 +123,41 @@ public class GaussSwing extends JFrame {
             }
             
             // Solução por Gauss
-            double[] x = GaussEliminacao.solve(A, b);
-            
-            // Decomposição LU
-            double[][][] LU = GaussEliminacao.decomposicaoLU(A);
-            double[][] L = LU[0];
-            double[][] U = LU[1];
+            GaussEliminacao.ResultadoGauss resultado = GaussEliminacao.solve(A, b);
             
             StringBuilder sb = new StringBuilder();
             sb.append("Solução por Eliminação de Gauss:\n");
             for (int i = 0; i < n; i++) {
-                sb.append("x[").append(i + 1).append("] = ").append(String.format("%.6f", x[i])).append("\n");
+                sb.append("x[").append(i + 1).append("] = ").append(String.format("%.6f", resultado.solucao[i])).append("\n");
+            }
+            
+            sb.append("\nEtapas da Eliminação:\n");
+            for (int k = 0; k <= n; k++) {
+                sb.append("\nEtapa ").append(k).append(":\n");
+                for (int i = 0; i < n; i++) {
+                    // Matriz A
+                    for (int j = 0; j < n; j++) {
+                        sb.append(String.format("%8.3f", resultado.etapas[k][i][j]));
+                    }
+                    // Vetor b
+                    sb.append(" | ").append(String.format("%8.3f", resultado.vetores[k][i]));
+                    sb.append("\n");
+                }
+            }
+            
+            sb.append("\nMatriz de Permutação P:\n");
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    sb.append(String.format("%8.3f", resultado.matrizP[i][j]));
+                }
+                sb.append("\n");
             }
             
             sb.append("\nDecomposição LU:\n");
             sb.append("L = \n");
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    sb.append(String.format("%8.3f", L[i][j]));
+                    sb.append(String.format("%8.3f", resultado.matrizL[i][j]));
                 }
                 sb.append("\n");
             }
@@ -105,7 +165,7 @@ public class GaussSwing extends JFrame {
             sb.append("\nU = \n");
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    sb.append(String.format("%8.3f", U[i][j]));
+                    sb.append(String.format("%8.3f", resultado.matrizU[i][j]));
                 }
                 sb.append("\n");
             }
@@ -116,7 +176,5 @@ public class GaussSwing extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new GaussSwing().setVisible(true));
-    }
+    // Método main removido pois agora usamos via MetodosCalculo
 }
